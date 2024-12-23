@@ -8,14 +8,14 @@ const ChampList = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
   const { request } = useHttp();
 
-  // interface RootState {
-  //   champs: {
-  //     loading: boolean;
-  //     error: string;
-  //     entites: Champion[];
-  //   };
-  // }
-
+  interface RootState {
+    champs: {
+      loading: boolean;
+      error: string;
+      entites: Champion[];
+    };
+  }
+  // Test12
   // const { champs } = useSelector((state: RootState) => state.champs);
 
   let data;
