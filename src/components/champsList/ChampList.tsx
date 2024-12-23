@@ -1,48 +1,40 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Champion, fetchChamps } from "./ChampSlice";
+import { Champion, ChampionState, fetchChamps } from "./ChampSlice";
 import { useEffect } from "react";
-import store from "../../store";
-import useHttp from "../../hooks/https";
+import store, { RootState } from "../../store";
+import "./champList.scss";
 
 const ChampList = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
-  const { request } = useHttp();
 
-  interface RootState {
-    champs: {
-      loading: boolean;
-      error: string;
-      entites: Champion[];
-    };
-  }
-  // Test12
-  // const { champs } = useSelector((state: RootState) => state.champs);
+  const { loading, error, entities } = useSelector(
+    (state: RootState) => state.champsReducer
+  );
 
-  let data;
-
-  // useEffect(() => {
-  //   dispatch(fetchChamps());
-  // }, []);
+  const champions: Champion[] = Object.values(entities);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await fetch("http://localhost:3001/champions");
-        const response = await data.json();
-        console.log(response); // Выводим данные, полученные с сервера
-      } catch (error) {
-        console.error("Error fetching data:", error); // Обработка ошибки
-      }
-    };
+    dispatch(fetchChamps());
+  }, []);
 
-    fetchData(); // Вызов асинхронной функции
-  }, [request]);
+  function champRender(arr: Champion[]): JSX.Element[] {
+    const champs = arr.map((champ) => (
+      <div key={champ.id} className="champ">
+        <img
+          src={require(`../../assets/champIcons/${champ.id}.jpg`)}
+          alt={champ.name}
+        />
+        <p className="champ__name">{`${champ.name}`}</p>
+      </div>
+    ));
+    return champs;
+  }
 
-  // if (loading === true) {
-  //   return <div>"LOADING"</div>;
-  // }
+  if (loading === true) {
+    return <div className="loading">"LOADING"</div>;
+  }
 
-  return <div>"123"</div>;
+  return <div>{champRender(champions)};</div>;
 };
 
 export default ChampList;
