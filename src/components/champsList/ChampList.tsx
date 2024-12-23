@@ -15,7 +15,7 @@ const ChampList = () => {
       entites: Champion[];
     };
   }
-  // Test
+  // Test12
   // const { champs } = useSelector((state: RootState) => state.champs);
 
   let data;
