@@ -1,8 +1,48 @@
 .champ {
   display: flex;
-  margin-bottom: 30px;
+  color: rgb(201, 170, 113);
   &__name {
+    margin: auto auto;
     margin-left: 10px;
-    font-size: 20px;
+    font-size: 16px;
   }
+  &__class {
+    img {
+      height: 30px;
+      width: 30px;
+      margin: 5px;
+    }
+    display: flex;
+    align-items: center;
+    &_descr {
+      color: rgb(201, 170, 113);
+      margin-left: 0px;
+    }
+  }
+}
+
+.champ-wrapper {
+  margin: 20px;
+  display: grid;
+  grid-template-columns: 400px 600px;
+  justify-content: center;
+  align-items: center;
+}
+
+.devider {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  opacity: 0.3;
+}
+
+.innerHeader {
+  color: rgb(255, 255, 255);
+  padding-left: 30px;
+  display: grid;
+  grid-template-columns: 400px 600px;
+  font-size: 22px;
+  height: 80px;
+  background-color: rgb(9, 41, 73);
 }
