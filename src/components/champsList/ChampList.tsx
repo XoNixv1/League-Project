@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Champion, ChampionState, fetchChamps } from "./ChampSlice";
-import { useEffect } from "react";
+import { Champion, fetchChamps } from "./ChampSlice";
+import { useEffect, useState } from "react";
 import store, { RootState } from "../../store";
 import "./champList.scss";
 
@@ -11,11 +11,46 @@ const ChampList = () => {
     (state: RootState) => state.champsReducer
   );
 
-  const champions: Champion[] = Object.values(entities);
+  enum Sort {
+    NoSort = "",
+    AtoZ = " sortable__AtoZ",
+    ZtoA = " sortable__ZtoA",
+  }
+  const [champions, setChampions] = useState<Champion[]>(
+    Object.values(entities)
+  );
+  const [champSortStatus, setChampSortStatus] = useState<Sort>(Sort.NoSort);
+  const [classesSortStatus, setClassesSortStatus] = useState<Sort>(Sort.NoSort);
 
   useEffect(() => {
     dispatch(fetchChamps());
   }, []);
+
+  const setStatus = (itemToSort: string, status: Sort): void => {
+    itemToSort === "champSortStatus"
+      ? setChampSortStatus(status)
+      : setClassesSortStatus(status);
+  };
+
+  const sortChamps = (itemToSort: string): void => {
+    if (itemToSort === "champSortStatus") {
+      const newStatus =
+        champSortStatus === Sort.NoSort
+          ? Sort.AtoZ
+          : champSortStatus === Sort.AtoZ
+            ? Sort.ZtoA
+            : Sort.NoSort;
+      setStatus("champSortStatus", newStatus);
+    } else {
+      const newStatus =
+        classesSortStatus === Sort.NoSort
+          ? Sort.AtoZ
+          : classesSortStatus === Sort.AtoZ
+            ? Sort.ZtoA
+            : Sort.NoSort;
+      setStatus("classesSortStatus", newStatus);
+    }
+  };
 
   function classRender(champClass: string): JSX.Element {
     const classes = champClass.split(",").map((classWord, i) => {
@@ -87,8 +122,18 @@ const ChampList = () => {
   return (
     <div>
       <div className="innerHeader">
-        <p>Champion</p>
-        <p>Classes</p>
+        <p
+          className={`sortable${champSortStatus}`}
+          onClick={() => sortChamps("champSortStatus")}
+        >
+          Champion
+        </p>
+        <p
+          className={`sortable${classesSortStatus}`}
+          onClick={() => sortChamps("classesSortStatus")}
+        >
+          Classes
+        </p>
       </div>
       <span className="devider"></span>
       {champRender(champions)};
