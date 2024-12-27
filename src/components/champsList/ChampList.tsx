@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Champion, fetchChamps } from "./ChampSlice";
 import { useEffect, useState } from "react";
 import store, { RootState } from "../../store";
+import { v4 as uuidv4 } from "uuid";
 import "./champList.scss";
 
 const ChampList = () => {
@@ -16,9 +17,7 @@ const ChampList = () => {
     AtoZ = " sortable__AtoZ",
     ZtoA = " sortable__ZtoA",
   }
-  const [champions, setChampions] = useState<Champion[]>(
-    Object.values(entities)
-  );
+  const [champions, setChampions] = useState<Champion[]>([]);
   const [champSortStatus, setChampSortStatus] = useState<Sort>(Sort.NoSort);
   const [classesSortStatus, setClassesSortStatus] = useState<Sort>(Sort.NoSort);
 
@@ -26,34 +25,56 @@ const ChampList = () => {
     dispatch(fetchChamps());
   }, []);
 
-  const setStatus = (itemToSort: string, status: Sort): void => {
+  useEffect(() => {
+    if (entities && Object.keys(entities).length > 0) {
+      setChampions(Object.values(entities));
+    }
+  }, [entities]);
+
+  const sortChamps = (itemToSort: string): void => {
+    let currentStatus: Sort;
+    if (itemToSort === "champSortStatus") {
+      currentStatus = champSortStatus;
+      setClassesSortStatus(Sort.NoSort);
+    } else {
+      currentStatus = classesSortStatus;
+      setChampSortStatus(Sort.NoSort);
+    }
+
+    const newStatus =
+      currentStatus === Sort.NoSort
+        ? Sort.AtoZ
+        : currentStatus === Sort.AtoZ
+          ? Sort.ZtoA
+          : Sort.NoSort;
+
+    setSortStatus(itemToSort, newStatus);
+    sortMethod(itemToSort, newStatus);
+  };
+
+  const setSortStatus = (itemToSort: string, status: Sort): void => {
     itemToSort === "champSortStatus"
       ? setChampSortStatus(status)
       : setClassesSortStatus(status);
   };
 
-  const sortChamps = (itemToSort: string): void => {
-    if (itemToSort === "champSortStatus") {
-      const newStatus =
-        champSortStatus === Sort.NoSort
-          ? Sort.AtoZ
-          : champSortStatus === Sort.AtoZ
-            ? Sort.ZtoA
-            : Sort.NoSort;
-      setStatus("champSortStatus", newStatus);
+  const sortMethod = (itemToSort: string, status: Sort): void => {
+    const fieldToSort = itemToSort === "champSortStatus" ? "name" : "tags";
+
+    if (status === Sort.NoSort) {
+      setChampions(Object.values(entities));
     } else {
-      const newStatus =
-        classesSortStatus === Sort.NoSort
-          ? Sort.AtoZ
-          : classesSortStatus === Sort.AtoZ
-            ? Sort.ZtoA
-            : Sort.NoSort;
-      setStatus("classesSortStatus", newStatus);
+      const sortedChampions = [...champions].sort((a, b) => {
+        const compareValue = a[fieldToSort].localeCompare(b[fieldToSort]);
+        return status === Sort.AtoZ ? compareValue : -compareValue;
+      });
+
+      setChampions(sortedChampions);
     }
   };
 
   function classRender(champClass: string): JSX.Element {
-    const classes = champClass.split(",").map((classWord, i) => {
+    const classes = champClass.split(",").map((classWord) => {
       let classImg: string;
       let className: string;
       switch (classWord.trim()) {
@@ -82,10 +103,10 @@ const ChampList = () => {
           className = "Tank";
           break;
         default:
-          return <p key={i}>{classWord}</p>;
+          return <p key={uuidv4()}>{classWord}</p>;
       }
       return (
-        <span className="champ__class" key={i}>
+        <span className="champ__class" key={uuidv4()}>
           <img src={classImg} alt={className} />
           <p className="champ__class_descr">{className}</p>
         </span>
