@@ -1,19 +1,7 @@
-import { createAsyncThunk, createSlice, EntityState } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { createEntityAdapter } from "@reduxjs/toolkit";
 import useHttp from "../../hooks/https";
-
-export interface ChampionState extends EntityState<Champion, string> {
-  loading: boolean;
-  error: string;
-}
-
-export interface Champion {
-  id: string;
-  lore: string;
-  name: string;
-  tags: string;
-  title: string;
-}
+import { Champion, ChampionState } from "./champTypes";
 
 const champsAdapter = createEntityAdapter<Champion>();
 
@@ -24,7 +12,7 @@ const initialState: ChampionState = champsAdapter.getInitialState({
 
 export const fetchChamps = createAsyncThunk("champs/FetchChamps", async () => {
   const { request } = useHttp();
-  return await request("http://localhost:3001/champions");
+  return await request("http://localhost:3001/data");
 });
 
 const chapmsSlice = createSlice({

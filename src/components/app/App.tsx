@@ -1,15 +1,13 @@
+import ChampPage from "../champPage/ChampPage";
 import ChampList from "../champsList/ChampList";
 import "./app.scss";
-import ContentHeader from "../contentHeader/ContentHeader";
 
 function App() {
   return (
     <main className="App">
       <div className="wrapper">
-        <ContentHeader />
-        <div className="inner">
-          <ChampList />
-        </div>
+        <ChampList />
+        <ChampPage />
       </div>
     </main>
   );

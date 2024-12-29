@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Champion, fetchChamps } from "./ChampSlice";
+import { fetchChamps } from "./ChampSlice";
 import { useEffect, useState } from "react";
 import store, { RootState } from "../../store";
 import { v4 as uuidv4 } from "uuid";
 import "./champList.scss";
+import ContentHeader from "../contentHeader/ContentHeader";
+import { Champion, Tags } from "./champTypes";
 
 const ChampList = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
@@ -23,13 +25,15 @@ const ChampList = () => {
 
   useEffect(() => {
     dispatch(fetchChamps());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    if (entities && Object.keys(entities).length > 0) {
+    if (entities) {
       setChampions(Object.values(entities));
     }
   }, [entities]);
+
+  console.log(champions);
 
   const sortChamps = (itemToSort: string): void => {
     let currentStatus: Sort;
@@ -59,13 +63,28 @@ const ChampList = () => {
   };
 
   const sortMethod = (itemToSort: string, status: Sort): void => {
-    const fieldToSort = itemToSort === "champSortStatus" ? "name" : "tags";
+    const fieldToSort: keyof Champion =
+      itemToSort === "champSortStatus" ? "name" : "tags";
 
     if (status === Sort.NoSort) {
       setChampions(Object.values(entities));
     } else {
       const sortedChampions = [...champions].sort((a, b) => {
-        const compareValue = a[fieldToSort].localeCompare(b[fieldToSort]);
+        let compareValue = 0;
+        if (fieldToSort === "name") {
+          if (
+            typeof a[fieldToSort] === "string" &&
+            typeof b[fieldToSort] === "string"
+          ) {
+            compareValue = a[fieldToSort].localeCompare(b[fieldToSort]);
+          }
+        } else if (fieldToSort === "tags") {
+          if (Array.isArray(a[fieldToSort]) && Array.isArray(b[fieldToSort])) {
+            const tagA = a[fieldToSort].sort().join(",");
+            const tagB = b[fieldToSort].sort().join(",");
+            compareValue = tagA.localeCompare(tagB);
+          }
+        }
         return status === Sort.AtoZ ? compareValue : -compareValue;
       });
 
@@ -73,32 +92,32 @@ const ChampList = () => {
     }
   };
 
-  function classRender(champClass: string): JSX.Element {
-    const classes = champClass.split(",").map((classWord) => {
+  function classRender(champClass: Tags[]): JSX.Element {
+    const classes = champClass.map((classWord) => {
       let classImg: string;
       let className: string;
       switch (classWord.trim()) {
-        case "mage":
+        case Tags.MAGE:
           classImg = "/assets/classesIcons/Mage_icon.webp";
           className = "Mage";
           break;
-        case "carry":
+        case Tags.MARKSMAN:
           classImg = "/assets/classesIcons/Marksman_icon.webp";
           className = "Marksman";
           break;
-        case "fighter":
+        case Tags.FIGHTER:
           classImg = "/assets/classesIcons/Fighter_icon.webp";
           className = "Fighter";
           break;
-        case "assassin":
+        case Tags.ASSASIN:
           classImg = "/assets/classesIcons/Slayer_icon.webp";
           className = "Assassin";
           break;
-        case "support":
+        case Tags.SUPPORT:
           classImg = "/assets/classesIcons/Controller_icon.webp";
           className = "Support";
           break;
-        case "tank":
+        case Tags.TANK:
           classImg = "/assets/classesIcons/Tank_icon.webp";
           className = "Tank";
           break;
@@ -119,9 +138,9 @@ const ChampList = () => {
     const champs = arr.map((champ) => (
       <div>
         <div className="champ-wrapper">
-          <div key={champ.id} className="champ">
+          <div key={champ.name} className="champ">
             <img
-              src={require(`../../assets/champIcons/${champ.id}.jpg`)}
+              src={require(`../../assets/champIcons/${champ.id}.png`)}
               alt={champ.name}
             />
             <p className="champ__name">
@@ -141,24 +160,27 @@ const ChampList = () => {
   }
 
   return (
-    <div>
-      <div className="innerHeader">
-        <p
-          className={`sortable${champSortStatus}`}
-          onClick={() => sortChamps("champSortStatus")}
-        >
-          Champion
-        </p>
-        <p
-          className={`sortable${classesSortStatus}`}
-          onClick={() => sortChamps("classesSortStatus")}
-        >
-          Classes
-        </p>
+    <>
+      <ContentHeader />
+      <div className="inner">
+        <div className="innerHeader">
+          <p
+            className={`sortable${champSortStatus}`}
+            onClick={() => sortChamps("champSortStatus")}
+          >
+            Champion
+          </p>
+          <p
+            className={`sortable${classesSortStatus}`}
+            onClick={() => sortChamps("classesSortStatus")}
+          >
+            Classes
+          </p>
+        </div>
+        <span className="devider"></span>
+        {champRender(champions)}
       </div>
-      <span className="devider"></span>
-      {champRender(champions)};
-    </div>
+    </>
   );
 };
 
