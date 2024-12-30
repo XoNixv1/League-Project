@@ -69,24 +69,24 @@ const ChampList = () => {
     if (status === Sort.NoSort) {
       setChampions(Object.values(entities));
     } else {
-      const sortedChampions = [...champions].sort((a, b) => {
-        let compareValue = 0;
-        if (fieldToSort === "name") {
-          if (
-            typeof a[fieldToSort] === "string" &&
-            typeof b[fieldToSort] === "string"
-          ) {
+      const sortedChampions = JSON.parse(JSON.stringify(champions)).sort(
+        (a: Champion, b: Champion) => {
+          let compareValue = 0;
+          if (fieldToSort === "name") {
             compareValue = a[fieldToSort].localeCompare(b[fieldToSort]);
+          } else if (fieldToSort === "tags") {
+            if (
+              Array.isArray(a[fieldToSort]) &&
+              Array.isArray(b[fieldToSort])
+            ) {
+              const tagA = a[fieldToSort].sort().join(",");
+              const tagB = b[fieldToSort].sort().join(",");
+              compareValue = tagA.localeCompare(tagB);
+            }
           }
-        } else if (fieldToSort === "tags") {
-          if (Array.isArray(a[fieldToSort]) && Array.isArray(b[fieldToSort])) {
-            const tagA = a[fieldToSort].sort().join(",");
-            const tagB = b[fieldToSort].sort().join(",");
-            compareValue = tagA.localeCompare(tagB);
-          }
+          return status === Sort.AtoZ ? compareValue : -compareValue;
         }
-        return status === Sort.AtoZ ? compareValue : -compareValue;
-      });
+      );
 
       setChampions(sortedChampions);
     }
@@ -134,6 +134,16 @@ const ChampList = () => {
     return <>{classes}</>;
   }
 
+  const skinsRender = (skins: Champion["skins"]) => {
+    const newSkins = skins.slice(1).map((skin) => (
+      <div className="skins__skin">
+        <img src="../../assets/skinsIcon.webp" alt="" />
+        <p>{`${skin.name} `}</p>
+      </div>
+    ));
+    return newSkins;
+  };
+
   function champRender(arr: Champion[]): JSX.Element[] {
     const champs = arr.map((champ) => (
       <div>
@@ -148,6 +158,7 @@ const ChampList = () => {
             </p>
           </div>
           <div className="champ__class">{classRender(champ.tags)}</div>
+          <div className="skins">{skinsRender(champ.skins)}</div>
         </div>
         <span className="devider"></span>
       </div>
@@ -176,6 +187,7 @@ const ChampList = () => {
           >
             Classes
           </p>
+          <p className={`skins-header`}>Skins</p>
         </div>
         <span className="devider"></span>
         {champRender(champions)}

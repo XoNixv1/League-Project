@@ -49,6 +49,13 @@ export enum Tags {
   FIGHTER = "Fighter",
 }
 
+interface Skin {
+  id: string;
+  num: number;
+  name: string;
+  chromas: boolean;
+}
+
 export interface Champion {
   version: string;
   id: string;
@@ -61,6 +68,7 @@ export interface Champion {
   tags: Tags[];
   partype: string;
   stats: Stats;
+  skins: Skin[];
 }
 
 export interface ChampionState extends EntityState<Champion, string> {
