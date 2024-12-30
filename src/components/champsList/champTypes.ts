@@ -53,22 +53,43 @@ interface Skin {
   id: string;
   num: number;
   name: string;
-  chromas: boolean;
+}
+
+interface Spells {
+  id: string;
+  name: string;
+  description: string;
+  tooltip: string;
+  maxrank: number;
+  coldown: number[];
+  cooldownBurn: string;
+  cost: number[];
+  costBurn: string;
+  costType: string;
+  maxammo: string;
+  range: number[];
+  rangeBurn: string;
+  resource: string;
+}
+
+interface Passive {
+  name: string;
+  description: string;
 }
 
 export interface Champion {
-  version: string;
   id: string;
   key: string;
   name: string;
   title: string;
-  blurb: string;
+  lore: string;
   info: Info;
   image: Image;
   tags: Tags[];
-  partype: string;
   stats: Stats;
   skins: Skin[];
+  spells: Spells[];
+  passive: Passive;
 }
 
 export interface ChampionState extends EntityState<Champion, string> {

@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import "./champList.scss";
 import ContentHeader from "../contentHeader/ContentHeader";
 import { Champion, Tags } from "./champTypes";
+import { Link } from "react-router-dom";
 
 const ChampList = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
@@ -23,6 +24,8 @@ const ChampList = () => {
   const [champSortStatus, setChampSortStatus] = useState<Sort>(Sort.NoSort);
   const [classesSortStatus, setClassesSortStatus] = useState<Sort>(Sort.NoSort);
 
+  //// CHAMPIONS DISPATCH
+
   useEffect(() => {
     dispatch(fetchChamps());
   }, [dispatch]);
@@ -31,9 +34,11 @@ const ChampList = () => {
     if (entities) {
       setChampions(Object.values(entities));
     }
-  }, [entities]);
+  }, [loading]);
 
-  console.log(champions);
+  console.log(entities);
+
+  ////  SORTING CHAMPIONS
 
   const sortChamps = (itemToSort: string): void => {
     let currentStatus: Sort;
@@ -61,6 +66,8 @@ const ChampList = () => {
       ? setChampSortStatus(status)
       : setClassesSortStatus(status);
   };
+
+  //// SORT METHOD
 
   const sortMethod = (itemToSort: string, status: Sort): void => {
     const fieldToSort: keyof Champion =
@@ -91,6 +98,8 @@ const ChampList = () => {
       setChampions(sortedChampions);
     }
   };
+
+  //// CLASSES RENDER
 
   function classRender(champClass: Tags[]): JSX.Element {
     const classes = champClass.map((classWord) => {
@@ -134,9 +143,11 @@ const ChampList = () => {
     return <>{classes}</>;
   }
 
+  //// SKINS RENDER
+
   const skinsRender = (skins: Champion["skins"]) => {
     const newSkins = skins.slice(1).map((skin) => (
-      <div className="skins__skin">
+      <div className="skins__skin" key={skin.id}>
         <img src="../../assets/skinsIcon.webp" alt="" />
         <p>{`${skin.name} `}</p>
       </div>
@@ -144,11 +155,13 @@ const ChampList = () => {
     return newSkins;
   };
 
+  //// CHAMPIONS RENDER
+
   function champRender(arr: Champion[]): JSX.Element[] {
     const champs = arr.map((champ) => (
-      <div>
+      <div key={champ.key}>
         <div className="champ-wrapper">
-          <div key={champ.name} className="champ">
+          <Link to={`/${champ.id}`} key={champ.name} className="champ">
             <img
               src={require(`../../assets/champIcons/${champ.id}.png`)}
               alt={champ.name}
@@ -156,7 +169,7 @@ const ChampList = () => {
             <p className="champ__name">
               {`${champ.name} `} <br /> <br /> {`${champ.title}`}
             </p>
-          </div>
+          </Link>
           <div className="champ__class">{classRender(champ.tags)}</div>
           <div className="skins">{skinsRender(champ.skins)}</div>
         </div>
@@ -165,6 +178,8 @@ const ChampList = () => {
     ));
     return champs;
   }
+
+  //// LOADING OR RENDER
 
   if (loading === true) {
     return <div className="loading">"LOADING"</div>;
