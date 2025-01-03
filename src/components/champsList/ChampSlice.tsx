@@ -12,37 +12,33 @@ const initialState: ChampionState = champsAdapter.getInitialState({
 
 //// FETCH
 
-export const fetchChamps = createAsyncThunk("champs/FetchChamps", async () => {
-  const { request } = useHttp();
-  return await request("http://localhost:3001/data");
-});
+export const fetchChamps = createAsyncThunk(
+  "champs/FetchChamps",
+  async (url: string) => {
+    const { request } = useHttp();
+    return await request(url);
+  }
+);
 
 //// DATA PREPARATION
 
-const prepareChampionsData = (data: Record<string, Champion>) => {
+const prepareChampData = (data: Record<string, Champion> | Champion) => {
   const preparedData: Record<string, Champion> = Object.entries(data).reduce(
     (acc, [key, champ]) => {
       acc[key] = {
         id: champ.id,
         key: champ.key,
         name: champ.name,
-        title: champ.title,
-        info: champ.info,
-        image: champ.image,
-        skins: champ.skins.map((skin: Champion["skins"][number]) => ({
-          id: skin.id,
-          name: skin.name,
-          num: skin.num,
-        })),
-        lore: champ.lore,
         tags: champ.tags,
+        title: champ.title,
+        lore: champ.lore,
+        info: champ.info,
         stats: champ.stats,
+        passive: champ.passive,
         spells: champ.spells.map((spell: Champion["spells"][number]) => ({
           id: spell.id,
           name: spell.name,
-          resource: spell.resource,
           description: spell.description,
-          tooltip: spell.tooltip,
           maxrank: spell.maxrank,
           coldown: spell.coldown,
           cooldownBurn: spell.cooldownBurn,
@@ -52,8 +48,13 @@ const prepareChampionsData = (data: Record<string, Champion>) => {
           maxammo: spell.maxammo,
           range: spell.range,
           rangeBurn: spell.rangeBurn,
+          resource: spell.resource,
         })),
-        passive: champ.passive,
+        skins: champ.skins.map((skin: Champion["skins"][number]) => ({
+          id: skin.id,
+          name: skin.name,
+          num: skin.num,
+        })),
       };
       return acc;
     },
@@ -67,7 +68,11 @@ const prepareChampionsData = (data: Record<string, Champion>) => {
 const chapmsSlice = createSlice({
   name: "champs",
   initialState,
-  reducers: {},
+  reducers: {
+    clearChampData(state) {
+      state.entities = {};
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchChamps.pending, (state) => {
@@ -75,7 +80,7 @@ const chapmsSlice = createSlice({
         state.error = "";
       })
       .addCase(fetchChamps.fulfilled, (state, action) => {
-        const preparedData = prepareChampionsData(action.payload);
+        const preparedData = prepareChampData(action.payload);
         champsAdapter.setAll(state, preparedData);
         state.loading = false;
       })
@@ -88,4 +93,5 @@ const chapmsSlice = createSlice({
 
 const { actions, reducer } = chapmsSlice;
 
+export const { clearChampData } = actions;
 export default reducer;

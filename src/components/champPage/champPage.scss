@@ -22,6 +22,7 @@
     }
   }
   &__section {
+    padding: 10px;
     position: relative;
     display: flex;
     justify-content: center;
@@ -40,9 +41,14 @@
     }
   }
   &__descr-name {
+    display: flex;
+    align-items: center;
+    img {
+      margin-right: 5px;
+      height: 15px;
+      width: 15px;
+    }
     color: rgb(201, 170, 113);
-    margin-top: 10px;
-    margin-bottom: 5px;
   }
   &__descr-value {
     margin: 10px;

@@ -27,16 +27,14 @@ const ChampList = () => {
   //// CHAMPIONS DISPATCH
 
   useEffect(() => {
-    dispatch(fetchChamps());
+    dispatch(fetchChamps("http://localhost:3001/data"));
   }, [dispatch]);
 
   useEffect(() => {
     if (entities) {
-      setChampions(Object.values(entities));
+      setChampions(Object.values(entities) as Champion[]);
     }
-  }, [loading]);
-
-  console.log(entities);
+  }, [loading, entities]);
 
   ////  SORTING CHAMPIONS
 
@@ -74,7 +72,7 @@ const ChampList = () => {
       itemToSort === "champSortStatus" ? "name" : "tags";
 
     if (status === Sort.NoSort) {
-      setChampions(Object.values(entities));
+      setChampions(Object.values(entities) as Champion[]);
     } else {
       const sortedChampions = JSON.parse(JSON.stringify(champions)).sort(
         (a: Champion, b: Champion) => {

@@ -1,43 +1,20 @@
 import { EntityState } from "@reduxjs/toolkit";
 
-interface Image {
-  full: string;
-  sprite: string;
-  group: string;
-  x: number;
-  y: number;
-  w?: number;
-  h?: number;
-}
+// interface Image {
+//   full: string;
+//   sprite: string;
+//   group: string;
+//   x: number;
+//   y: number;
+//   w?: number;
+//   h?: number;
+// }
 
 interface Info {
   attack: number;
   defense: number;
   magic: number;
   difficulty: number;
-}
-
-interface Stats {
-  hp: number;
-  hpperlevel: number;
-  mp: number;
-  mpperlevel: number;
-  movespeed: number;
-  armor: number;
-  armorperlevel: number;
-  spellblock: number;
-  spellblockperlevel: number;
-  attackrange: number;
-  hpregen: number;
-  hpregenperlevel: number;
-  mpregen: number;
-  mpregenperlevel: number;
-  crit: number;
-  critperlevel: number;
-  attackdamage: number;
-  attackdamageperlevel: number;
-  attackspeedperlevel: number;
-  attackspeed: number;
 }
 
 export enum Tags {
@@ -59,7 +36,6 @@ interface Spells {
   id: string;
   name: string;
   description: string;
-  tooltip: string;
   maxrank: number;
   coldown: number[];
   cooldownBurn: string;
@@ -82,12 +58,11 @@ export interface Champion {
   key: string;
   name: string;
   title: string;
-  lore: string;
   info: Info;
-  image: Image;
-  tags: Tags[];
-  stats: Stats;
   skins: Skin[];
+  tags: Tags[];
+  lore: string;
+  stats: Record<string, number>;
   spells: Spells[];
   passive: Passive;
 }
