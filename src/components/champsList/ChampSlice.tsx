@@ -1,30 +1,78 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { createEntityAdapter } from "@reduxjs/toolkit";
 import useHttp from "../../hooks/https";
+import { Champion, ChampionState } from "./champTypes";
 
-export interface Champion {
-  id: number;
-  name: string;
-  title: string;
-  tags: string;
-}
+const champsAdapter = createEntityAdapter<Champion>();
 
-const champsAdapter = createEntityAdapter();
-
-const initialState = champsAdapter.getInitialState({
+const initialState: ChampionState = champsAdapter.getInitialState({
   loading: false,
   error: "",
 });
 
-export const fetchChamps = createAsyncThunk("champs/FetchChamps", async () => {
-  const { request } = useHttp();
-  return await request("http://localhost:3001/champions");
-});
+//// FETCH
+
+export const fetchChamps = createAsyncThunk(
+  "champs/FetchChamps",
+  async (url: string) => {
+    const { request } = useHttp();
+    return await request(url);
+  }
+);
+
+//// DATA PREPARATION
+
+const prepareChampData = (data: Record<string, Champion> | Champion) => {
+  const preparedData: Record<string, Champion> = Object.entries(data).reduce(
+    (acc, [key, champ]) => {
+      acc[key] = {
+        id: champ.id,
+        key: champ.key,
+        name: champ.name,
+        tags: champ.tags,
+        title: champ.title,
+        lore: champ.lore,
+        info: champ.info,
+        stats: champ.stats,
+        passive: champ.passive,
+        spells: champ.spells.map((spell: Champion["spells"][number]) => ({
+          id: spell.id,
+          name: spell.name,
+          description: spell.description,
+          maxrank: spell.maxrank,
+          coldown: spell.coldown,
+          cooldownBurn: spell.cooldownBurn,
+          cost: spell.cost,
+          costBurn: spell.costBurn,
+          costType: spell.costType,
+          maxammo: spell.maxammo,
+          range: spell.range,
+          rangeBurn: spell.rangeBurn,
+          resource: spell.resource,
+        })),
+        skins: champ.skins.map((skin: Champion["skins"][number]) => ({
+          id: skin.id,
+          name: skin.name,
+          num: skin.num,
+        })),
+      };
+      return acc;
+    },
+    {} as Record<string, Champion>
+  );
+  return preparedData;
+};
+
+//// CHAMP REDUCER
 
 const chapmsSlice = createSlice({
   name: "champs",
   initialState,
-  reducers: {},
+  reducers: {
+    clearChampData(state) {
+      state.entities = {};
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchChamps.pending, (state) => {
@@ -32,7 +80,8 @@ const chapmsSlice = createSlice({
         state.error = "";
       })
       .addCase(fetchChamps.fulfilled, (state, action) => {
-        champsAdapter.setAll(state, action.payload);
+        const preparedData = prepareChampData(action.payload);
+        champsAdapter.setAll(state, preparedData);
         state.loading = false;
       })
       .addCase(fetchChamps.rejected, (state, action) => {
@@ -44,4 +93,5 @@ const chapmsSlice = createSlice({
 
 const { actions, reducer } = chapmsSlice;
 
+export const { clearChampData } = actions;
 export default reducer;

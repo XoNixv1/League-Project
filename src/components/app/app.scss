@@ -1,14 +1,30 @@
 body {
   margin: 0;
+  font-family: "Roboto", "Rubik", sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
+
 .App {
   height: 100vh;
   overflow-y: scroll;
   background: url(../../assets/bg/1291921.jpg) no-repeat center center;
 }
 
-.content {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding-top: 50px;
+.wrapper {
+  border: 1px solid rgb(201, 170, 113);
+  padding: 50px;
+  max-width: 1180px;
+  margin: 100px auto;
+  background-color: rgb(6, 14, 31);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
+}
+
+.inner {
+  background-color: rgb(6, 30, 54);
+}
+
+.colored-txt {
+  color: rgb(201, 170, 113);
+  padding-left: 4px;
 }
