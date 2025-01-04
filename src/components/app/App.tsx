@@ -1,11 +1,13 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import ChampPage from "../champPage/ChampPage";
 import ChampList from "../champsList/ChampList";
 import "./app.scss";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter
+      future={{ v7_relativeSplatPath: true, v7_startTransition: true }}
+    >
       <main className="App">
         <div className="wrapper">
           <Routes>
@@ -16,7 +18,7 @@ function App() {
           {/* <ChampPage /> */}
         </div>
       </main>
-    </Router>
+    </BrowserRouter>
   );
 }
 

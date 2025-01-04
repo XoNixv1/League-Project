@@ -39,6 +39,7 @@ const prepareChampData = (data: Record<string, Champion> | Champion) => {
           id: spell.id,
           name: spell.name,
           description: spell.description,
+          tooltip: spell.tooltip,
           maxrank: spell.maxrank,
           coldown: spell.coldown,
           cooldownBurn: spell.cooldownBurn,

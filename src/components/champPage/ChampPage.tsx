@@ -13,6 +13,7 @@ const ChampPage = (): JSX.Element => {
     champId ? state.champsReducer.entities[champId] : undefined
   );
   const [champion, setChampion] = useState<Champion>();
+  const [spellInfo, setSpellInfo] = useState<string>("");
 
   const { loading } = useSelector((state: RootState) => state.champsReducer);
 
@@ -21,9 +22,7 @@ const ChampPage = (): JSX.Element => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (champData) {
-      setChampion(champData);
-    }
+    setChampion(champData);
   }, [loading, champData]);
 
   const statNames: Record<string, string> = {
@@ -49,19 +48,97 @@ const ChampPage = (): JSX.Element => {
     attackspeed: "Attack Speed",
   };
 
-  const renderStats = () => {
-    if (champion) {
-      const stats = Object.entries(champion.stats).map(([key, value]) => (
-        <div className="stats__section" key={key}>
-          <div className="stats__descr-name">
-            <img src={`/assets/statsIcons/${key}.webp`} alt="" />
-            <p>{statNames[key]}</p>
-          </div>
-          <p className="stats__descr-value">{value}</p>
+  const parseData = (inputData: string): string => {
+    const regex = /<\s*(.*?)\s*>/g;
+    return inputData.replace(regex, (match: string, p: string) => {
+      switch (p.toLowerCase()) {
+        case "physicaldamage":
+          return `<span style="color: orange">${p}</span>`;
+        case "magicdamage":
+          return `<span style="color: blue">${p}</span>`;
+        case "speed":
+          return `<span style="color: grey">${p}</span>`;
+        case "totalhealthdamagepercent":
+          return `<span style="color: #61be2a">${p}</span>`;
+        default:
+          return `<span style="color: #ffffff">${p}</span>`;
+      }
+    });
+  };
+
+  const onSpellClick = (id: string) => {
+    setSpellInfo(id);
+  };
+
+  const renderSpellDescription = (): string => {
+    const spellOrPassiveDescr: string | undefined = champData
+      ? champData.spells.find((item) => item.id === spellInfo)?.tooltip ||
+        champData.passive.name
+      : "Error";
+    return parseData(spellOrPassiveDescr);
+  };
+
+  const renderStats = (champion: Champion) => {
+    const stats = Object.entries(champion.stats).map(([key, value]) => (
+      <div className="stats__section" key={key}>
+        <div className="stats__descr-name">
+          <img src={`/assets/statsIcons/${key}.webp`} alt="" />
+          <p>{statNames[key]}</p>
         </div>
-      ));
-      return stats;
-    }
+        <p className="stats__descr-value">{value}</p>
+      </div>
+    ));
+    return stats;
+  };
+
+  console.log(champData);
+
+  const renderAbilities = (champ: Champion): JSX.Element => {
+    return (
+      <div className="container">
+        <div className="spell-container">
+          <div
+            className="spell__passive"
+            onClick={() => onSpellClick(champ.passive.name)}
+          >
+            <img
+              className="spell__active"
+              src={require(
+                `../../assets/passiveIcons/${champ.passive.image.full}`
+              )}
+              alt={champ.passive.name}
+            />
+            <label className="spell__passive_label">P</label>
+          </div>
+          <div className="spell-devider"></div>
+          {champ.spells.map((spell, key) => (
+            <div
+              className="spell"
+              key={key}
+              onClick={() => onSpellClick(spell.id)}
+            >
+              <img
+                className=""
+                src={require(`../../assets/spellIcons/${spell.id}.png`)}
+                alt={spell.id}
+              />
+              <div className="spell__label">{spell.id.slice(-1)}</div>
+            </div>
+          ))}
+        </div>
+        <div className="second-spell-devider"></div>
+        <div className="spell__descr-container">
+          <h4 style={{ fontSize: 18 }}>
+            {champ
+              ? champ.spells
+                  .find((item) => item.id === spellInfo)
+                  ?.name.toUpperCase() || champ.passive?.name.toUpperCase()
+              : "Error"}
+          </h4>
+          <p className="spell__descr">{renderSpellDescription()}</p>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -70,7 +147,10 @@ const ChampPage = (): JSX.Element => {
         <img src={`../../assets/champSplash/${champId}_0.jpg`} alt="" />
       </div>
       <div className="stats__header">Base statistics</div>
-      <div className="stats__descr">{renderStats()}</div>
+      <div className="stats__descr">
+        {champion ? renderStats(champion) : "ERROR"}
+      </div>
+      {champion ? renderAbilities(champion) : "ERROR"}
     </div>
   );
 };
