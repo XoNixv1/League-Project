@@ -5,6 +5,7 @@ import store, { RootState } from "../../store";
 import { useEffect, useState } from "react";
 import { fetchChamps } from "../champsList/ChampSlice";
 import { Champion } from "../champsList/champTypes";
+import { CSSTransition } from "react-transition-group";
 
 const ChampPage = (): JSX.Element => {
   const dispatch = useDispatch<typeof store.dispatch>();
@@ -14,6 +15,8 @@ const ChampPage = (): JSX.Element => {
   );
   const [champion, setChampion] = useState<Champion>();
   const [spellInfo, setSpellInfo] = useState<string>("");
+  const [fadeData, setFadeData] = useState<string>("");
+  const [fade, setFade] = useState<boolean>(true);
 
   const { loading } = useSelector((state: RootState) => state.champsReducer);
 
@@ -22,7 +25,11 @@ const ChampPage = (): JSX.Element => {
   }, [dispatch]);
 
   useEffect(() => {
-    setChampion(champData);
+    if (champData) {
+      setChampion(champData);
+      setSpellInfo(champData.passive.name);
+      setFadeData(champData.passive.name);
+    }
   }, [loading, champData]);
 
   const statNames: Record<string, string> = {
@@ -48,34 +55,23 @@ const ChampPage = (): JSX.Element => {
     attackspeed: "Attack Speed",
   };
 
-  const parseData = (inputData: string): string => {
-    const regex = /<\s*(.*?)\s*>/g;
-    return inputData.replace(regex, (match: string, p: string) => {
-      switch (p.toLowerCase()) {
-        case "physicaldamage":
-          return `<span style="color: orange">${p}</span>`;
-        case "magicdamage":
-          return `<span style="color: blue">${p}</span>`;
-        case "speed":
-          return `<span style="color: grey">${p}</span>`;
-        case "totalhealthdamagepercent":
-          return `<span style="color: #61be2a">${p}</span>`;
-        default:
-          return `<span style="color: #ffffff">${p}</span>`;
-      }
-    });
-  };
-
   const onSpellClick = (id: string) => {
     setSpellInfo(id);
+    if (fadeData !== id) {
+      setFade(false);
+      setTimeout(() => {
+        setFadeData(id);
+        setFade(true);
+      }, 500);
+    }
   };
 
   const renderSpellDescription = (): string => {
     const spellOrPassiveDescr: string | undefined = champData
-      ? champData.spells.find((item) => item.id === spellInfo)?.tooltip ||
-        champData.passive.name
+      ? champData.spells.find((item) => item.id === fadeData)?.description ||
+        champData.passive.description
       : "Error";
-    return parseData(spellOrPassiveDescr);
+    return spellOrPassiveDescr;
   };
 
   const renderStats = (champion: Champion) => {
@@ -95,6 +91,8 @@ const ChampPage = (): JSX.Element => {
 
   const renderAbilities = (champ: Champion): JSX.Element => {
     return (
+      /// PASSIVE
+
       <div className="container">
         <div className="spell-container">
           <div
@@ -102,7 +100,7 @@ const ChampPage = (): JSX.Element => {
             onClick={() => onSpellClick(champ.passive.name)}
           >
             <img
-              className="spell__active"
+              className={`spell ${spellInfo === champ.passive.name ? "spell__active" : ""}`}
               src={require(
                 `../../assets/passiveIcons/${champ.passive.image.full}`
               )}
@@ -111,6 +109,9 @@ const ChampPage = (): JSX.Element => {
             <label className="spell__passive_label">P</label>
           </div>
           <div className="spell-devider"></div>
+
+          {/* SPELLS */}
+
           {champ.spells.map((spell, key) => (
             <div
               className="spell"
@@ -118,7 +119,7 @@ const ChampPage = (): JSX.Element => {
               onClick={() => onSpellClick(spell.id)}
             >
               <img
-                className=""
+                className={`spell ${spellInfo === spell.id ? "spell__active" : ""}`}
                 src={require(`../../assets/spellIcons/${spell.id}.png`)}
                 alt={spell.id}
               />
@@ -127,16 +128,18 @@ const ChampPage = (): JSX.Element => {
           ))}
         </div>
         <div className="second-spell-devider"></div>
-        <div className="spell__descr-container">
-          <h4 style={{ fontSize: 18 }}>
-            {champ
-              ? champ.spells
-                  .find((item) => item.id === spellInfo)
-                  ?.name.toUpperCase() || champ.passive?.name.toUpperCase()
-              : "Error"}
-          </h4>
-          <p className="spell__descr">{renderSpellDescription()}</p>
-        </div>
+        <CSSTransition timeout={500} classNames="fade" unmountOnExit in={fade}>
+          <div className="spell__descr-container">
+            <h4 style={{ fontSize: 18 }}>
+              {champ
+                ? champ.spells
+                    .find((item) => item.id === fadeData)
+                    ?.name.toUpperCase() || champ.passive?.name.toUpperCase()
+                : "Error"}
+            </h4>
+            <p className="spell__descr">{renderSpellDescription()}</p>
+          </div>
+        </CSSTransition>
       </div>
     );
   };
