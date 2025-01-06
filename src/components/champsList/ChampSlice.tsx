@@ -22,45 +22,42 @@ export const fetchChamps = createAsyncThunk(
 
 //// DATA PREPARATION
 
-const prepareChampData = (data: Record<string, Champion> | Champion) => {
-  const preparedData: Record<string, Champion> = Object.entries(data).reduce(
-    (acc, [key, champ]) => {
-      acc[key] = {
-        id: champ.id,
-        key: champ.key,
-        name: champ.name,
-        tags: champ.tags,
-        title: champ.title,
-        lore: champ.lore,
-        info: champ.info,
-        stats: champ.stats,
-        passive: champ.passive,
-        spells: champ.spells.map((spell: Champion["spells"][number]) => ({
-          id: spell.id,
-          name: spell.name,
-          description: spell.description,
-          tooltip: spell.tooltip,
-          maxrank: spell.maxrank,
-          coldown: spell.coldown,
-          cooldownBurn: spell.cooldownBurn,
-          cost: spell.cost,
-          costBurn: spell.costBurn,
-          costType: spell.costType,
-          maxammo: spell.maxammo,
-          range: spell.range,
-          rangeBurn: spell.rangeBurn,
-          resource: spell.resource,
-        })),
-        skins: champ.skins.map((skin: Champion["skins"][number]) => ({
-          id: skin.id,
-          name: skin.name,
-          num: skin.num,
-        })),
-      };
-      return acc;
-    },
-    {} as Record<string, Champion>
+const prepareChampData = (data: Record<string, Champion>) => {
+  const preparedData: Champion[] = Object.values(data).map(
+    (champ: Champion) => ({
+      id: champ.id,
+      key: champ.key,
+      name: champ.name,
+      tags: champ.tags,
+      title: champ.title,
+      lore: champ.lore,
+      info: champ.info,
+      stats: champ.stats,
+      passive: champ.passive,
+      spells: champ.spells.map((spell: Champion["spells"][number]) => ({
+        id: spell.id,
+        name: spell.name,
+        description: spell.description,
+        tooltip: spell.tooltip,
+        maxrank: spell.maxrank,
+        coldown: spell.coldown,
+        cooldownBurn: spell.cooldownBurn,
+        cost: spell.cost,
+        costBurn: spell.costBurn,
+        costType: spell.costType,
+        maxammo: spell.maxammo,
+        range: spell.range,
+        rangeBurn: spell.rangeBurn,
+        resource: spell.resource,
+      })),
+      skins: champ.skins.map((skin: Champion["skins"][number]) => ({
+        id: skin.id,
+        name: skin.name,
+        num: skin.num,
+      })),
+    })
   );
+
   return preparedData;
 };
 

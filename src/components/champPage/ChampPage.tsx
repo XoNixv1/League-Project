@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./champPage.scss";
 import { useDispatch, useSelector } from "react-redux";
 import store, { RootState } from "../../store";
@@ -146,6 +146,7 @@ const ChampPage = (): JSX.Element => {
 
   return (
     <div className="stats">
+      <Link to={"/"} className="back-btn"></Link>
       <div className="stats__img">
         <img src={`../../assets/champSplash/${champId}_0.jpg`} alt="" />
       </div>
