@@ -196,6 +196,13 @@ const ChampList = () => {
     );
   }
 
+  const pageUp = () => {
+    const element = document.getElementById("toTop");
+    if (element) {
+      element.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  };
+
   //// ERROR OR RENDER
 
   if (error.length > 0) {
@@ -223,6 +230,9 @@ const ChampList = () => {
         </div>
         <span className="devider"></span>
         {champRender(champions)}
+      </div>
+      <div className="upBtn" onClick={() => pageUp()}>
+        <span></span>
       </div>
     </div>
   );

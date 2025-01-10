@@ -1,24 +1,24 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./champPage.scss";
 import { useDispatch, useSelector } from "react-redux";
 import store, { RootState } from "../../store";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchChamps } from "../champsList/ChampSlice";
 import { Champion } from "../champsList/champTypes";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "../../styles/animations.scss";
+import { selectChampionById } from "../selectors/Selectors";
 
 const ChampPage = (): JSX.Element => {
   const dispatch = useDispatch<typeof store.dispatch>();
   const { champId } = useParams<{ champId: string }>();
   const champData = useSelector((state: RootState) =>
-    champId ? state.champsReducer.entities[champId] : undefined
+    selectChampionById(state, champId)
   );
   const [champion, setChampion] = useState<Champion>();
   const [spellInfo, setSpellInfo] = useState<string>("");
   const [fadeData, setFadeData] = useState<string>("");
   const [fade, setFade] = useState<boolean>(true);
-  const location = useLocation();
 
   const { loading, error } = useSelector(
     (state: RootState) => state.champsReducer

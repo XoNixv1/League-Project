@@ -20,8 +20,8 @@ function Main() {
   const location = useLocation();
   return (
     <main className="App">
-      <div id="toTop"></div>
       <Header />
+      <div id="toTop"></div>
       <div className="wrapper">
         <SwitchTransition>
           <CSSTransition

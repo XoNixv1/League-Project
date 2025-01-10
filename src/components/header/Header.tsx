@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
 import "./header.scss";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import { Champion } from "../champsList/champTypes";
 import { CSSTransition } from "react-transition-group";
+import { selectChampionList } from "../selectors/Selectors";
 
 const Header = () => {
-  const championsList: Champion[] = useSelector((state: RootState) =>
-    Object.values(state.champsReducer.entities)
-  );
+  const championsList: Champion[] = useSelector(selectChampionList);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const searchRef = useRef<HTMLFormElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +64,7 @@ const Header = () => {
       </form>
       <CSSTransition
         timeout={500}
-        classNames="fade"
+        classNames="fadeNoExit"
         in={isOpen && searchTerm.length >= 2 && filteredChampions.length < 7}
         unmountOnExit
       >

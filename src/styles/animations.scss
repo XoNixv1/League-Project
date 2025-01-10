@@ -33,3 +33,16 @@
   opacity: 0;
   transition: opacity 500ms ease-in-out;
 }
+
+.fadeNoExit-enter {
+  opacity: 0;
+}
+
+.fadeNoExit-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
+}
+
+.fadeNoExit-exit {
+  opacity: 0;
+}
