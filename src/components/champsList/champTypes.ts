@@ -1,14 +1,14 @@
 import { EntityState } from "@reduxjs/toolkit";
 
-// interface Image {
-//   full: string;
-//   sprite: string;
-//   group: string;
-//   x: number;
-//   y: number;
-//   w?: number;
-//   h?: number;
-// }
+interface Image {
+  full: string;
+  sprite: string;
+  group: string;
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+}
 
 interface Info {
   attack: number;
@@ -46,11 +46,13 @@ interface Spells {
   range: number[];
   rangeBurn: string;
   resource: string;
+  tooltip: string;
 }
 
 interface Passive {
   name: string;
   description: string;
+  image: Image;
 }
 
 export interface Champion {

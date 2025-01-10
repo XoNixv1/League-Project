@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import store, { RootState } from "../../store";
 import { v4 as uuidv4 } from "uuid";
 import "./champList.scss";
-import ContentHeader from "../contentHeader/ContentHeader";
+import ContentHeader from "./contentHeader/ContentHeader";
 import { Champion, Tags } from "./champTypes";
 import { Link } from "react-router-dom";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "../../styles/animations.scss";
 
 const ChampList = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
@@ -23,6 +25,13 @@ const ChampList = () => {
   const [champions, setChampions] = useState<Champion[]>([]);
   const [champSortStatus, setChampSortStatus] = useState<Sort>(Sort.NoSort);
   const [classesSortStatus, setClassesSortStatus] = useState<Sort>(Sort.NoSort);
+
+  // @ts-ignore
+  const Images = require.context(
+    "../../assets",
+    true,
+    /\.(png|jpe?g|webp|svg)$/
+  );
 
   //// CHAMPIONS DISPATCH
 
@@ -105,27 +114,27 @@ const ChampList = () => {
       let className: string;
       switch (classWord.trim()) {
         case Tags.MAGE:
-          classImg = "/assets/classesIcons/Mage_icon.webp";
+          classImg = Images(`./classesIcons/Mage_icon.webp`);
           className = "Mage";
           break;
         case Tags.MARKSMAN:
-          classImg = "/assets/classesIcons/Marksman_icon.webp";
+          classImg = Images(`./classesIcons/Marksman_icon.webp`);
           className = "Marksman";
           break;
         case Tags.FIGHTER:
-          classImg = "/assets/classesIcons/Fighter_icon.webp";
+          classImg = Images(`./classesIcons/Fighter_icon.webp`);
           className = "Fighter";
           break;
         case Tags.ASSASIN:
-          classImg = "/assets/classesIcons/Slayer_icon.webp";
+          classImg = Images(`./classesIcons/Slayer_icon.webp`);
           className = "Assassin";
           break;
         case Tags.SUPPORT:
-          classImg = "/assets/classesIcons/Controller_icon.webp";
+          classImg = Images(`./classesIcons/Controller_icon.webp`);
           className = "Support";
           break;
         case Tags.TANK:
-          classImg = "/assets/classesIcons/Tank_icon.webp";
+          classImg = Images(`./classesIcons/Tank_icon.webp`);
           className = "Tank";
           break;
         default:
@@ -146,7 +155,7 @@ const ChampList = () => {
   const skinsRender = (skins: Champion["skins"]) => {
     const newSkins = skins.slice(1).map((skin) => (
       <div className="skins__skin" key={skin.id}>
-        <img src="../../assets/skinsIcon.webp" alt="" />
+        <img src={require("../../assets/skinsIcon.webp")} alt="" />
         <p>{`${skin.name} `}</p>
       </div>
     ));
@@ -155,36 +164,53 @@ const ChampList = () => {
 
   //// CHAMPIONS RENDER
 
-  function champRender(arr: Champion[]): JSX.Element[] {
-    const champs = arr.map((champ) => (
-      <div key={champ.key}>
-        <div className="champ-wrapper">
-          <Link to={`/${champ.id}`} key={champ.name} className="champ">
-            <img
-              src={require(`../../assets/champIcons/${champ.id}.png`)}
-              alt={champ.name}
-            />
-            <p className="champ__name">
-              {`${champ.name} `} <br /> <br /> {`${champ.title}`}
-            </p>
-          </Link>
-          <div className="champ__class">{classRender(champ.tags)}</div>
-          <div className="skins">{skinsRender(champ.skins)}</div>
-        </div>
-        <span className="devider"></span>
-      </div>
-    ));
-    return champs;
+  function champRender(arr: Champion[]): JSX.Element {
+    return (
+      <TransitionGroup component={null}>
+        {arr.map((champ) => (
+          <CSSTransition
+            key={champ.key}
+            classNames="fade"
+            timeout={500}
+            unmountOnExit
+          >
+            <div key={champ.key}>
+              <div className="champ-wrapper">
+                <Link to={`/${champ.id}`} key={champ.name} className="champ">
+                  <img
+                    src={Images(`./champIcons/${champ.id}.png`)}
+                    alt={champ.name}
+                  />
+                  <p className="champ__name">
+                    {`${champ.name} `} <br /> <br /> {`${champ.title}`}
+                  </p>
+                </Link>
+                <div className="champ__class">{classRender(champ.tags)}</div>
+                <div className="skins">{skinsRender(champ.skins)}</div>
+              </div>
+              <span className="devider"></span>
+            </div>
+          </CSSTransition>
+        ))}
+      </TransitionGroup>
+    );
   }
 
-  //// LOADING OR RENDER
+  const pageUp = () => {
+    const element = document.getElementById("toTop");
+    if (element) {
+      element.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  };
 
-  if (loading === true) {
-    return <div className="loading">"LOADING"</div>;
+  //// ERROR OR RENDER
+
+  if (error.length > 0) {
+    return <div className="error">{error}</div>;
   }
 
   return (
-    <>
+    <div className="championList">
       <ContentHeader />
       <div className="inner">
         <div className="innerHeader">
@@ -205,7 +231,10 @@ const ChampList = () => {
         <span className="devider"></span>
         {champRender(champions)}
       </div>
-    </>
+      <div className="upBtn" onClick={() => pageUp()}>
+        <span></span>
+      </div>
+    </div>
   );
 };
 

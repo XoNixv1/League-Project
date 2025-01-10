@@ -6,22 +6,21 @@ body {
 }
 
 .App {
+  position: relative;
   height: 100vh;
   overflow-y: scroll;
   background: url(../../assets/bg/1291921.jpg) no-repeat center center;
 }
 
 .wrapper {
+  position: relative;
   border: 1px solid rgb(201, 170, 113);
   padding: 50px;
   max-width: 1180px;
+  min-height: 1000px;
   margin: 100px auto;
   background-color: rgb(6, 14, 31);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
-}
-
-.inner {
-  background-color: rgb(6, 30, 54);
 }
 
 .colored-txt {
