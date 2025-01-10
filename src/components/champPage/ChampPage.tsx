@@ -1,11 +1,12 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import "./champPage.scss";
 import { useDispatch, useSelector } from "react-redux";
 import store, { RootState } from "../../store";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { fetchChamps } from "../champsList/ChampSlice";
 import { Champion } from "../champsList/champTypes";
-import { CSSTransition } from "react-transition-group";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "../../styles/animations.scss";
 
 const ChampPage = (): JSX.Element => {
   const dispatch = useDispatch<typeof store.dispatch>();
@@ -17,12 +18,22 @@ const ChampPage = (): JSX.Element => {
   const [spellInfo, setSpellInfo] = useState<string>("");
   const [fadeData, setFadeData] = useState<string>("");
   const [fade, setFade] = useState<boolean>(true);
+  const location = useLocation();
 
-  const { loading } = useSelector((state: RootState) => state.champsReducer);
+  const { loading, error } = useSelector(
+    (state: RootState) => state.champsReducer
+  );
 
   useEffect(() => {
     dispatch(fetchChamps("http://localhost:3001/data"));
   }, [dispatch]);
+
+  useEffect(() => {
+    const element = document.getElementById("toTop");
+    if (element) {
+      element.scrollIntoView({ block: "start" });
+    }
+  }, []);
 
   useEffect(() => {
     if (champData) {
@@ -70,26 +81,35 @@ const ChampPage = (): JSX.Element => {
     const spellOrPassiveDescr: string | undefined = champData
       ? champData.spells.find((item) => item.id === fadeData)?.description ||
         champData.passive.description
-      : "Error";
+      : "Something went wrong";
     return spellOrPassiveDescr;
   };
 
   const renderStats = (champion: Champion) => {
-    const stats = Object.entries(champion.stats).map(([key, value]) => (
-      <div className="stats__section" key={key}>
-        <div className="stats__descr-name">
-          <img src={`/assets/statsIcons/${key}.webp`} alt="" />
-          <p>{statNames[key]}</p>
-        </div>
-        <p className="stats__descr-value">{value}</p>
-      </div>
-    ));
-    return stats;
+    return (
+      <TransitionGroup component={null}>
+        {Object.entries(champion.stats).map(([key, value]) => (
+          <CSSTransition
+            key={key}
+            timeout={500}
+            unmountOnExit
+            classNames="fade"
+          >
+            <div className="stats__section" key={key}>
+              <div className="stats__descr-name">
+                <img src={`/assets/statsIcons/${key}.webp`} alt="" />
+                <p>{statNames[key]}</p>
+              </div>
+              <p className="stats__descr-value">{value}</p>
+            </div>
+          </CSSTransition>
+        ))}
+      </TransitionGroup>
+    );
   };
 
-  console.log(champData);
-
   const renderAbilities = (champ: Champion): JSX.Element => {
+    const spellKeys: string[] = ["Q", "W", "E", "R"];
     return (
       /// PASSIVE
 
@@ -123,12 +143,20 @@ const ChampPage = (): JSX.Element => {
                 src={require(`../../assets/spellIcons/${spell.id}.png`)}
                 alt={spell.id}
               />
-              <div className="spell__label">{spell.id.slice(-1)}</div>
+              <label className="spell__label">
+                {spellKeys[key % spellKeys.length]}
+              </label>
             </div>
           ))}
         </div>
         <div className="second-spell-devider"></div>
-        <CSSTransition timeout={500} classNames="fade" unmountOnExit in={fade}>
+        <CSSTransition
+          timeout={500}
+          classNames="fade"
+          key="spells"
+          unmountOnExit
+          in={fade}
+        >
           <div className="spell__descr-container">
             <h4 style={{ fontSize: 18 }}>
               {champ
@@ -144,17 +172,24 @@ const ChampPage = (): JSX.Element => {
     );
   };
 
+  if (error.length > 0) {
+    return <div className="error">{error}</div>;
+  }
+
   return (
     <div className="stats">
-      <Link to={"/"} className="back-btn"></Link>
+      <Link to={"/"} className="back-btn" id="back"></Link>
       <div className="stats__img">
-        <img src={`../../assets/champSplash/${champId}_0.jpg`} alt="" />
+        <img
+          src={require(`../../assets/champSplash/${champId}_0.jpg`)}
+          alt=""
+        />
       </div>
       <div className="stats__header">Base statistics</div>
       <div className="stats__descr">
-        {champion ? renderStats(champion) : "ERROR"}
+        {champion ? renderStats(champion) : undefined}
       </div>
-      {champion ? renderAbilities(champion) : "ERROR"}
+      {champion ? renderAbilities(champion) : undefined}
     </div>
   );
 };

@@ -2,8 +2,9 @@ import { Route, Routes, BrowserRouter, useLocation } from "react-router-dom";
 import ChampPage from "../champPage/ChampPage";
 import ChampList from "../champsList/ChampList";
 import "./app.scss";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
-import Header from "./header/Header";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
+import Header from "../header/Header";
+import "../../styles/animations.scss";
 
 function App() {
   return (
@@ -19,16 +20,22 @@ function Main() {
   const location = useLocation();
   return (
     <main className="App">
-      <Header></Header>
+      <div id="toTop"></div>
+      <Header />
       <div className="wrapper">
-        <TransitionGroup component={null}>
-          <CSSTransition key={location.key} timeout={500} classNames="page">
+        <SwitchTransition>
+          <CSSTransition
+            key={location.key}
+            timeout={500}
+            classNames="page"
+            unmountOnExit
+          >
             <Routes location={location}>
               <Route path="/" element={<ChampList />} />
               <Route path="/:champId" element={<ChampPage />} />
             </Routes>
           </CSSTransition>
-        </TransitionGroup>
+        </SwitchTransition>
       </div>
     </main>
   );

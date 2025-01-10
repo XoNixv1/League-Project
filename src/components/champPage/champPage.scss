@@ -62,8 +62,9 @@
     position: relative;
     border: 1px solid rgb(201, 170, 113);
     img {
-      position: absolute;
+      position: relative;
       top: -100px;
+      width: 100%;
     }
   }
 }
@@ -135,24 +136,6 @@
     padding: 50px;
     min-height: 150px;
   }
-}
-
-.fade-enter {
-  opacity: 0;
-}
-
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 500ms ease-in-out;
-}
-
-.fade-exit {
-  opacity: 1;
-}
-
-.fade-exit-active {
-  opacity: 0;
-  transition: opacity 500ms ease-in-out;
 }
 
 .back-btn {

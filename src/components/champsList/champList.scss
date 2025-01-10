@@ -17,6 +17,10 @@
   }
 }
 
+.inner {
+  background-color: rgb(6, 30, 54);
+}
+
 .innerHeader {
   position: relative;
   color: rgb(255, 255, 255);
@@ -136,4 +140,12 @@
       display: block;
     }
   }
+}
+
+.error {
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
