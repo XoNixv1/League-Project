@@ -72,6 +72,10 @@
     "webpack-manifest-plugin": "^4.0.2",
     "workbox-webpack-plugin": "^6.4.1"
   },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
+  },
   "scripts": {
     "start": "concurrently \"node scripts/start.js\" \"npm run server\"",
     "server": "json-server --watch database.json --port 3001",
