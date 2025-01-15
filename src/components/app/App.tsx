@@ -10,6 +10,7 @@ const ChampList = React.lazy(() => import("../champsList/ChampList"));
 function App() {
   return (
     <BrowserRouter
+      basename="XoNixv1"
       future={{ v7_relativeSplatPath: true, v7_startTransition: true }}
     >
       <Main />
