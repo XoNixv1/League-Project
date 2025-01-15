@@ -36,7 +36,11 @@ const ChampList = () => {
   //// CHAMPIONS DISPATCH
 
   useEffect(() => {
-    dispatch(fetchChamps("http://localhost:3001/data"));
+    dispatch(
+      fetchChamps(
+        "https://testxn0-hxjh4djzd-khaleds-projects-403334ef.vercel.app/api/data"
+      )
+    );
   }, [dispatch]);
 
   useEffect(() => {
@@ -61,8 +65,8 @@ const ChampList = () => {
       currentStatus === Sort.NoSort
         ? Sort.AtoZ
         : currentStatus === Sort.AtoZ
-          ? Sort.ZtoA
-          : Sort.NoSort;
+        ? Sort.ZtoA
+        : Sort.NoSort;
 
     setSortStatus(itemToSort, newStatus);
     sortMethod(itemToSort, newStatus);
