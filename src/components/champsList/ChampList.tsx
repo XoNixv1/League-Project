@@ -38,7 +38,7 @@ const ChampList = () => {
   useEffect(() => {
     dispatch(
       fetchChamps(
-        "https://testxn0-hxjh4djzd-khaleds-projects-403334ef.vercel.app/api/data"
+        "https://testxn0-hxjh4djzd-khaleds-projects-403334ef.vercel.app/api/json-server"
       )
     );
   }, [dispatch]);
