@@ -1,10 +1,11 @@
 import { Route, Routes, BrowserRouter, useLocation } from "react-router-dom";
-import ChampPage from "../champPage/ChampPage";
-import ChampList from "../champsList/ChampList";
-import "./app.scss";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import Header from "../header/Header";
 import "../../styles/animations.scss";
+import React, { Suspense } from "react";
+
+const ChampPage = React.lazy(() => import("../champPage/ChampPage"));
+const ChampList = React.lazy(() => import("../champsList/ChampList"));
 
 function App() {
   return (
@@ -30,10 +31,12 @@ function Main() {
             classNames="page"
             unmountOnExit
           >
-            <Routes location={location}>
-              <Route path="/" element={<ChampList />} />
-              <Route path="/:champId" element={<ChampPage />} />
-            </Routes>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Routes location={location}>
+                <Route path="/" element={<ChampList />} />
+                <Route path="/:champId" element={<ChampPage />} />
+              </Routes>
+            </Suspense>
           </CSSTransition>
         </SwitchTransition>
       </div>
