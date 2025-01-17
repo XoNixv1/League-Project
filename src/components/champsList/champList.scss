@@ -120,7 +120,7 @@
     @include arrow("down");
   }
 
-  &__AtoZ {
+  &__abc {
     &::before {
       display: none;
     }
@@ -134,7 +134,7 @@
     @include arrow("up");
   }
 
-  &__ZtoA {
+  &__cba {
     &::after {
       display: none;
     }

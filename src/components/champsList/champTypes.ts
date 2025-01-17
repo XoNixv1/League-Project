@@ -55,6 +55,12 @@ interface Passive {
   image: Image;
 }
 
+export enum Sort {
+  NoSort = "",
+  AtoZ = " sortable__abc",
+  ZtoA = " sortable__cba",
+}
+
 export interface Champion {
   id: string;
   key: string;

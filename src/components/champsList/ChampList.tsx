@@ -1,167 +1,81 @@
 import { useDispatch, useSelector } from "react-redux";
 import { fetchChamps } from "./ChampSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import store, { RootState } from "../../store";
 import { v4 as uuidv4 } from "uuid";
 import "./champList.scss";
 import ContentHeader from "./contentHeader/ContentHeader";
-import { Champion, Tags } from "./champTypes";
+import { Champion, Sort, Tags } from "./champTypes";
 import { Link } from "react-router-dom";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "../../styles/animations.scss";
 
+// IMAGES FROM SRC
+// @ts-ignore
+const Images = require.context("../../assets", true, /\.(png|jpe?g|webp|svg)$/);
+
+// CLASSES LIST
+
+const classMapping: Record<Tags, { img: string; name: string }> = {
+  [Tags.MAGE]: {
+    img: Images(`./classesIcons/Mage_icon.webp`),
+    name: "Mage",
+  },
+  [Tags.MARKSMAN]: {
+    img: Images(`./classesIcons/Marksman_icon.webp`),
+    name: "Marksman",
+  },
+  [Tags.FIGHTER]: {
+    img: Images(`./classesIcons/Fighter_icon.webp`),
+    name: "Fighter",
+  },
+  [Tags.ASSASIN]: {
+    img: Images(`./classesIcons/Slayer_icon.webp`),
+    name: "Assassin",
+  },
+  [Tags.SUPPORT]: {
+    img: Images(`./classesIcons/Controller_icon.webp`),
+    name: "Support",
+  },
+  [Tags.TANK]: {
+    img: Images(`./classesIcons/Tank_icon.webp`),
+    name: "Tank",
+  },
+};
+
+/// MAIN FUNCTION
+
 const ChampList = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
-
-  const { loading, error, entities } = useSelector(
+  const { error, entities } = useSelector(
     (state: RootState) => state.champsReducer
   );
+  const championList: Champion[] = Object.values(entities);
+  const [sortField, setSortField] = useState<keyof Champion>("id");
+  const [sortDirection, setSortDirection] = useState(Sort.NoSort);
+  const [firstArrowDirection, setFirstArrowDirection] = useState(Sort.NoSort);
+  const [secondArrowDirection, setSecondArrowDirection] = useState(Sort.NoSort);
 
-  enum Sort {
-    NoSort = "",
-    AtoZ = " sortable__AtoZ",
-    ZtoA = " sortable__ZtoA",
-  }
-  const [champions, setChampions] = useState<Champion[]>([]);
-  const [champSortStatus, setChampSortStatus] = useState<Sort>(Sort.NoSort);
-  const [classesSortStatus, setClassesSortStatus] = useState<Sort>(Sort.NoSort);
-
-  // @ts-ignore
-  const Images = require.context(
-    "../../assets",
-    true,
-    /\.(png|jpe?g|webp|svg)$/
+  const sortedChampionList = useMemo(
+    () => sortChampions(championList, sortField, sortDirection),
+    [championList, sortField, sortDirection]
   );
 
-  //// CHAMPIONS DISPATCH
+  //// LIST DISPATCH
 
   useEffect(() => {
     dispatch(fetchChamps("http://localhost:3001/data"));
   }, [dispatch]);
 
-  useEffect(() => {
-    if (entities) {
-      setChampions(Object.values(entities) as Champion[]);
-    }
-  }, [loading, entities]);
+  /// DEFINING SORT DIRECTION
 
-  ////  SORTING CHAMPIONS
-
-  const sortChamps = (itemToSort: string): void => {
-    let currentStatus: Sort;
-    if (itemToSort === "champSortStatus") {
-      currentStatus = champSortStatus;
-      setClassesSortStatus(Sort.NoSort);
-    } else {
-      currentStatus = classesSortStatus;
-      setChampSortStatus(Sort.NoSort);
-    }
-
-    const newStatus =
-      currentStatus === Sort.NoSort
-        ? Sort.AtoZ
-        : currentStatus === Sort.AtoZ
-        ? Sort.ZtoA
-        : Sort.NoSort;
-
-    setSortStatus(itemToSort, newStatus);
-    sortMethod(itemToSort, newStatus);
-  };
-
-  const setSortStatus = (itemToSort: string, status: Sort): void => {
-    itemToSort === "champSortStatus"
-      ? setChampSortStatus(status)
-      : setClassesSortStatus(status);
-  };
-
-  //// SORT METHOD
-
-  const sortMethod = (itemToSort: string, status: Sort): void => {
-    const fieldToSort: keyof Champion =
-      itemToSort === "champSortStatus" ? "name" : "tags";
-
-    if (status === Sort.NoSort) {
-      setChampions(Object.values(entities) as Champion[]);
-    } else {
-      const sortedChampions = JSON.parse(JSON.stringify(champions)).sort(
-        (a: Champion, b: Champion) => {
-          let compareValue = 0;
-          if (fieldToSort === "name") {
-            compareValue = a[fieldToSort].localeCompare(b[fieldToSort]);
-          } else if (fieldToSort === "tags") {
-            if (
-              Array.isArray(a[fieldToSort]) &&
-              Array.isArray(b[fieldToSort])
-            ) {
-              const tagA = a[fieldToSort].sort().join(",");
-              const tagB = b[fieldToSort].sort().join(",");
-              compareValue = tagA.localeCompare(tagB);
-            }
-          }
-          return status === Sort.AtoZ ? compareValue : -compareValue;
-        }
-      );
-
-      setChampions(sortedChampions);
-    }
-  };
-
-  //// CLASSES RENDER
-
-  function classRender(champClass: Tags[]): JSX.Element {
-    const classes = champClass.map((classWord) => {
-      let classImg: string;
-      let className: string;
-      switch (classWord.trim()) {
-        case Tags.MAGE:
-          classImg = Images(`./classesIcons/Mage_icon.webp`);
-          className = "Mage";
-          break;
-        case Tags.MARKSMAN:
-          classImg = Images(`./classesIcons/Marksman_icon.webp`);
-          className = "Marksman";
-          break;
-        case Tags.FIGHTER:
-          classImg = Images(`./classesIcons/Fighter_icon.webp`);
-          className = "Fighter";
-          break;
-        case Tags.ASSASIN:
-          classImg = Images(`./classesIcons/Slayer_icon.webp`);
-          className = "Assassin";
-          break;
-        case Tags.SUPPORT:
-          classImg = Images(`./classesIcons/Controller_icon.webp`);
-          className = "Support";
-          break;
-        case Tags.TANK:
-          classImg = Images(`./classesIcons/Tank_icon.webp`);
-          className = "Tank";
-          break;
-        default:
-          return <p key={uuidv4()}>{classWord}</p>;
-      }
-      return (
-        <span className="champ__class" key={uuidv4()}>
-          <img src={classImg} alt={className} />
-          <p className="champ__class_descr">{className}</p>
-        </span>
-      );
-    });
-    return <>{classes}</>;
+  function handleSetSortDirection() {
+    return sortDirection === Sort.NoSort
+      ? Sort.AtoZ
+      : sortDirection === Sort.AtoZ
+      ? Sort.ZtoA
+      : Sort.NoSort;
   }
-
-  //// SKINS RENDER
-
-  const skinsRender = (skins: Champion["skins"]) => {
-    const newSkins = skins.slice(1).map((skin) => (
-      <div className="skins__skin" key={skin.id}>
-        <img src={require("../../assets/skinsIcon.webp")} alt="" />
-        <p>{`${skin.name} `}</p>
-      </div>
-    ));
-    return newSkins;
-  };
-
   //// CHAMPIONS RENDER
 
   function champRender(arr: Champion[]): JSX.Element {
@@ -185,8 +99,10 @@ const ChampList = () => {
                     {`${champ.name} `} <br /> <br /> {`${champ.title}`}
                   </p>
                 </Link>
-                <div className="champ__class">{classRender(champ.tags)}</div>
-                <div className="skins">{skinsRender(champ.skins)}</div>
+                <div className="champ__class">
+                  {ClassRender(champ.tags, classMapping)}
+                </div>
+                <div className="skins">{SkinsRender(champ.skins)}</div>
               </div>
               <span className="devider"></span>
             </div>
@@ -195,13 +111,6 @@ const ChampList = () => {
       </TransitionGroup>
     );
   }
-
-  const pageUp = () => {
-    const element = document.getElementById("toTop");
-    if (element) {
-      element.scrollIntoView({ block: "start", behavior: "smooth" });
-    }
-  };
 
   //// ERROR OR RENDER
 
@@ -215,26 +124,118 @@ const ChampList = () => {
       <div className="inner">
         <div className="innerHeader">
           <p
-            className={`sortable${champSortStatus}`}
-            onClick={() => sortChamps("champSortStatus")}
+            className={`sortable${firstArrowDirection}`}
+            onClick={() => {
+              setSortField("id");
+              setSortDirection(handleSetSortDirection());
+              setFirstArrowDirection(handleSetSortDirection());
+            }}
           >
             Champion
           </p>
           <p
-            className={`sortable${classesSortStatus}`}
-            onClick={() => sortChamps("classesSortStatus")}
+            className={`sortable${secondArrowDirection}`}
+            onClick={() => {
+              setSortField("tags");
+              setSecondArrowDirection(handleSetSortDirection());
+              setSortDirection(handleSetSortDirection());
+            }}
           >
             Classes
           </p>
           <p className={`skins-header`}>Skins</p>
         </div>
         <span className="devider"></span>
-        {champRender(champions)}
+        {champRender(sortedChampionList)}
       </div>
       <div className="upBtn" onClick={() => pageUp()}>
         <span></span>
       </div>
     </div>
+  );
+};
+
+/// PAGE UP METHOD
+
+const pageUp = () => {
+  const element = document.getElementById("toTop");
+  if (element) {
+    element.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+};
+
+/// SORT METHOD
+
+function sortChampions(
+  list: Champion[],
+  field: keyof Champion,
+  direction: string
+): Champion[] {
+  const clonedList: Champion[] = list.slice();
+
+  switch (field) {
+    case "id":
+      clonedList.sort((a: Champion, b: Champion) =>
+        direction === Sort.AtoZ
+          ? a[field].localeCompare(b[field])
+          : direction === Sort.ZtoA
+          ? b[field].localeCompare(a[field])
+          : 0
+      );
+      break;
+    case "tags":
+      clonedList.sort((a: Champion, b: Champion) =>
+        direction === Sort.AtoZ
+          ? a.tags.join(",").localeCompare(b.tags.join(","))
+          : direction === Sort.ZtoA
+          ? b.tags.join(",").localeCompare(a.tags.join(","))
+          : 0
+      );
+      break;
+  }
+
+  return clonedList;
+}
+
+//// CLASSES RENDER
+
+function ClassRender(
+  champClass: Tags[],
+  mappingList: typeof classMapping
+): JSX.Element {
+  return useMemo(
+    () => (
+      <>
+        {champClass.map((classWord) => {
+          const classData = mappingList[classWord.trim() as Tags];
+          if (classData) {
+            return (
+              <span className="champ__class" key={uuidv4()}>
+                <img src={classData.img} alt={classData.name} />
+                <p className="champ__class_descr">{classData.name}</p>
+              </span>
+            );
+          }
+          return <p key={uuidv4()}>{classWord}</p>;
+        })}
+      </>
+    ),
+    [champClass, mappingList]
+  );
+}
+
+//// SKINS RENDER
+
+const SkinsRender = (skins: Champion["skins"]) => {
+  return useMemo(
+    () =>
+      skins.slice(1).map((skin) => (
+        <div className="skins__skin" key={skin.id}>
+          <img src={require("../../assets/skinsIcon.webp")} alt="" />
+          <p>{`${skin.name} `}</p>
+        </div>
+      )),
+    [skins]
   );
 };
 
