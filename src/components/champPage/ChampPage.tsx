@@ -25,7 +25,7 @@ const ChampPage = (): JSX.Element => {
   );
 
   useEffect(() => {
-    dispatch(fetchChamps("http://localhost:3002/champ-list"));
+    dispatch(fetchChamps("https://server-1nzu.onrender.com/champ-list"));
   }, [dispatch]);
 
   useEffect(() => {
