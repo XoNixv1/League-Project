@@ -12,5 +12,5 @@ This project is a **League of Legends Champion Explorer**, built using **TypeScr
 ## Deployment
 
 You can explore the project live here:  
-[League Project Deployment](https://league-project-lake.vercel.app/Aatrox)
+[League Project Deployment](https://league-project-lake.vercel.app/)
 **Note:** It may take a couple of minutes for the app to load since the project uses a free server deployment.
