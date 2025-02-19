@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchChamps } from "./ChampSlice";
 import { useEffect, useMemo, useState } from "react";
 import store, { RootState } from "../../store";
-import { v4 as uuidv4 } from "uuid";
 import "./champList.scss";
 import ContentHeader from "./contentHeader/ContentHeader";
 import { Champion, Sort, Tags } from "./champTypes";
@@ -11,6 +10,7 @@ import { CSSTransition, TransitionGroup } from "react-transition-group";
 import "../../styles/animations.scss";
 
 // IMAGES FROM SRC
+
 // @ts-ignore
 const Images = require.context("../../assets", true, /\.(png|jpe?g|webp|svg)$/);
 
@@ -64,7 +64,7 @@ const ChampList = () => {
   //// LIST DISPATCH
 
   useEffect(() => {
-    dispatch(fetchChamps("http://localhost:3001/data"));
+    dispatch(fetchChamps("http://localhost:3002/champ-list"));
   }, [dispatch]);
 
   /// DEFINING SORT DIRECTION
@@ -76,7 +76,8 @@ const ChampList = () => {
       ? Sort.ZtoA
       : Sort.NoSort;
   }
-  //// CHAMPIONS RENDER
+
+  /// CHAMPIONS RENDER
 
   function champRender(arr: Champion[]): JSX.Element {
     return (
@@ -203,40 +204,33 @@ function ClassRender(
   champClass: Tags[],
   mappingList: typeof classMapping
 ): JSX.Element {
-  return useMemo(
-    () => (
-      <>
-        {champClass.map((classWord) => {
-          const classData = mappingList[classWord.trim() as Tags];
-          if (classData) {
-            return (
-              <span className="champ__class" key={uuidv4()}>
-                <img src={classData.img} alt={classData.name} />
-                <p className="champ__class_descr">{classData.name}</p>
-              </span>
-            );
-          }
-          return <p key={uuidv4()}>{classWord}</p>;
-        })}
-      </>
-    ),
-    [champClass, mappingList]
+  return (
+    <>
+      {champClass.map((classWord, i) => {
+        const classData = mappingList[classWord.trim() as Tags];
+        if (classData) {
+          return (
+            <span className="champ__class" key={classWord + i}>
+              <img src={classData.img} alt={classData.name} />
+              <p className="champ__class_descr">{classData.name}</p>
+            </span>
+          );
+        }
+        return <p key={classWord + i}>{classWord}</p>;
+      })}
+    </>
   );
 }
 
 //// SKINS RENDER
 
 const SkinsRender = (skins: Champion["skins"]) => {
-  return useMemo(
-    () =>
-      skins.slice(1).map((skin) => (
-        <div className="skins__skin" key={skin.id}>
-          <img src={require("../../assets/skinsIcon.webp")} alt="" />
-          <p>{`${skin.name} `}</p>
-        </div>
-      )),
-    [skins]
-  );
+  return skins.slice(1).map((skin) => (
+    <div className="skins__skin" key={skin.id}>
+      <img src={require("../../assets/skinsIcon.webp")} alt="" />
+      <p>{`${skin.name} `}</p>
+    </div>
+  ));
 };
 
 export default ChampList;

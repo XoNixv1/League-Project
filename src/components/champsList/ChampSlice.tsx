@@ -23,7 +23,7 @@ export const fetchChamps = createAsyncThunk(
 //// DATA PREPARATION
 
 const prepareChampData = (data: Record<string, Champion>) => {
-  const preparedData: Champion[] = Object.values(data).map(
+  const preparedData: Champion[] = Object.values(data.data).map(
     (champ: Champion) => ({
       id: champ.id,
       key: champ.key,
@@ -40,7 +40,7 @@ const prepareChampData = (data: Record<string, Champion>) => {
         description: spell.description,
         tooltip: spell.tooltip,
         maxrank: spell.maxrank,
-        coldown: spell.coldown,
+        cooldown: spell.cooldown,
         cooldownBurn: spell.cooldownBurn,
         cost: spell.cost,
         costBurn: spell.costBurn,

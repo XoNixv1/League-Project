@@ -25,7 +25,7 @@ const ChampPage = (): JSX.Element => {
   );
 
   useEffect(() => {
-    dispatch(fetchChamps("http://localhost:3001/data"));
+    dispatch(fetchChamps("http://localhost:3002/champ-list"));
   }, [dispatch]);
 
   useEffect(() => {
@@ -120,10 +120,10 @@ const ChampPage = (): JSX.Element => {
             onClick={() => onSpellClick(champ.passive.name)}
           >
             <img
-              className={`spell ${spellInfo === champ.passive.name ? "spell__active" : ""}`}
-              src={require(
-                `../../assets/passiveIcons/${champ.passive.image.full}`
-              )}
+              className={`spell ${
+                spellInfo === champ.passive.name ? "spell__active" : ""
+              }`}
+              src={require(`../../assets/passiveIcons/${champ.passive.image.full}`)}
               alt={champ.passive.name}
             />
             <label className="spell__passive_label">P</label>
@@ -139,7 +139,9 @@ const ChampPage = (): JSX.Element => {
               onClick={() => onSpellClick(spell.id)}
             >
               <img
-                className={`spell ${spellInfo === spell.id ? "spell__active" : ""}`}
+                className={`spell ${
+                  spellInfo === spell.id ? "spell__active" : ""
+                }`}
                 src={require(`../../assets/spellIcons/${spell.id}.png`)}
                 alt={spell.id}
               />

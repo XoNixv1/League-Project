@@ -26,18 +26,18 @@ export enum Tags {
   FIGHTER = "Fighter",
 }
 
-interface Skin {
+export interface Skin {
   id: string;
   num: number;
   name: string;
 }
 
-interface Spells {
+export interface Spells {
   id: string;
   name: string;
   description: string;
   maxrank: number;
-  coldown: number[];
+  cooldown: number[];
   cooldownBurn: string;
   cost: number[];
   costBurn: string;
