@@ -8,7 +8,7 @@ This project is a **League of Legends Champion Explorer**, built using **TypeScr
 - **Redux**: Manages the global state of champions and their stats.
 - **Node.js**: Backend server to provide data via API endpoints.
 - **Express**: Framework for creating API routes.
-
+  
 ## Deployment
 
 You can explore the project live here:  
